@@ -22,7 +22,7 @@ X = mu + sigma.*randn(N,1);
 % Note: For today, it's safe to assume that the data points were generated
 % independently of each other.
 muML = sum(X) / N;    % So put your answer here in place of zero.
-sigmaML = sum((X - muML).^2) / N; % So put your answer here in place of zero.
+sigmaML = sqrt(sum((X - muML).^2) / N); % So put your answer here in place of zero.
  
 % Plotting univariate normal
 % normalizing histograms - assuming bins are evenly sized

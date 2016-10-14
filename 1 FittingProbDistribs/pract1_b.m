@@ -32,13 +32,13 @@ delta = 0;
 % TODO 1 - On paper derive the MAP parameter estimates for the normal
 % distribution using the normal inverse gamma prior and then insert the
 % equations below
-muML = 0;
-sigmaML = 0;
-muMAP = 0;
-sigmaMAP = 0;
+muML = sum(X) / N;
+sigmaML = sqrt(sum((X - muML).^2) / N);
+muMAP = (N * muML + gamma*delta)/(N+gamma);
+sigmaMAP = sqrt((sum((X-muMAP).^2) + 2*beta + gamma((delta-mu)^2)) / (N + 3 + 2*alpha));
  
 % TODO remove this break when you have completeed the first section
-break
+
  
 %% Likelihood function
 sigmaRange = [0 : 0.01 : 2];
@@ -60,6 +60,7 @@ end
 % TODO 5 - Empirically verify that the maximum of the posterior is at the same position as
 % your MAP solution
 posterior = zeros(size(prior));
+posterior = lfun .* prior;
  
 % Plotting the likelihood, prior and posterior
 figure
