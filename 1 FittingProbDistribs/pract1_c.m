@@ -26,18 +26,18 @@ delta = 0;
  
 % parameters for posterior
 % TODO 1 - Define the parameters for the Bayesian posterior
-alphaP = 0;
-gammaP = 0;
-deltaP = 0;
-betaP = 0;
+alphaP = alpha + N/2;
+gammaP = gamma + N;
+deltaP = (gamma*delta + sum(X)) / (gamma + N);
+betaP = sum(X.^2)/2 + beta + gamma*delta^2 / 2 - (gamma*delta + sum(X))^2/(2*(gamma+N));
  
  
 %% ML + MAP Parameter Estimation of univariate normal
 % TODO - fill these equations from the previous section
-muMAP = 0;
-sigmaMAP = 0;
-muML = 0;
-sigmaML = 0;
+muML = sum(X) / N;
+sigmaML = sqrt(sum((X - muML).^2) / N);
+muMAP = (N * muML + gamma*delta)/(N+gamma);
+sigmaMAP = sqrt((sum((X-muMAP).^2) + 2*beta + gamma((delta-mu)^2)) / (N + 3 + 2*alpha));
  
  
 %% Likelihood function
@@ -52,11 +52,12 @@ for s=1:length(sigmaRange)
         prior(s,m) = normalInvGamma( alpha, beta, delta, gamma, sigmaRange(s), muRange(m) ); 
         
         % TODO 2 - Compute the posterior given the new closed form expression
-        conjPosterior(s,m) = 0;
+        conjPosterior(s,m) = normalInvGamma( alphaP, betaP, deltaP, gammaP, sigmaRange(s), muRange(m) );
     end
 end
 % TODO - Estimate the posterior
 posterior = zeros(size(prior));
+posterior = lfun.*prior;
 % TODO 3 - Empirically compare the closed form posterior to the product of
 % likelihood and prior from Part b
 % TODO 4 - Show that peak of this distribution again corresponds to the MAP
