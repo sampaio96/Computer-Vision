@@ -3,4 +3,5 @@ function res = normal( X, sigma, mu )
 % parameters (mu, sigma) of the one-dimensional normal distribution.
 N = length(X);
 % TODO fill out this function
-res = (2*pi*sigma^2)^(-N/2) * exp(-0.5 * sum(((X-mu).^2)./sigma^2));
+% res = (sqrt(2*pi*sigma^2))^(-N/2) * exp(-0.5 * sum(((X-mu).^2)./sigma^2));
+res

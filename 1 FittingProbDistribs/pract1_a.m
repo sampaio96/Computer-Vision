@@ -21,8 +21,8 @@ X = mu + sigma.*randn(N,1);
 % distribution and then insert the equations here.
 % Note: For today, it's safe to assume that the data points were generated
 % independently of each other.
-muML = 0;    % So put your answer here in place of zero.
-sigmaML = 0; % So put your answer here in place of zero.
+muML = sum(X) / N;    % So put your answer here in place of zero.
+sigmaML = sum((X - muML).^2) / N; % So put your answer here in place of zero.
  
 % Plotting univariate normal
 % normalizing histograms - assuming bins are evenly sized
@@ -36,7 +36,7 @@ title('ML parameter fited distribution')
 hold off
 
 % TODO remove this break when you have completed the first section
-break
+
  
 %% Likelihood function
 % 
