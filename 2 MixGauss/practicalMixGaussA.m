@@ -87,9 +87,8 @@ function like = calcGaussianProb(data,gaussMean,gaussCov)
 
 %TO DO (b) - fill in this routine
 %replace this
-like = 0;
-
-
+D = length(data);
+like = 1/((2*pi)^(D/2)*(norm(gaussCov))^(1/2))*exp(-0.5*((data-gaussMean).')*inv(gaussCov)*(data-gaussMean));
 
 %==========================================================================
 %==========================================================================
@@ -100,20 +99,28 @@ like = 0;
 %with the mean RGB value.  The covariance should be a 3x3 covariance
 %matrix. See the note at the top, which explains that using mean() is ok,
 %but please compute the covariance yourself.
-function [meanData covData] = fitGaussianModel(data);
+function [meanData covData] = fitGaussianModel(data)
 
 [nDim nData] = size(data);
 
 %TO DO (a): replace this
-meanData = randn(nDim,1);
-covData = eye(nDim);
+meanData = mean(data.').';
+covData = cov(data.');
+% covDatas = zeros(nDim);
+% covCalculated = zeros(nDim);
+% for a = 1:nDim
+%     for b = 1:nDim
+%         if covCalculated(b,a)
+%             covDatas(a,b) = covDatas(b,a);
+%         else
+%             covDatas(a,b) = (data(:,a)-mean(a)).' * (data(:,b)-mean(b));
+%         end
+%     end
+% end
+% if (nDim ~= 1)
+%     covDatas = covDatas ./ (nDim-1);
+% end
+% differencemx = zeros(3);
+% differencemx = covData - covDatas + 100
 
-%calculate mean of data.  You can do this using the MATLAB command 'mean'
-
-%calculate covariance of data.  You should do this yourself to ensure you
-%understand how.  Check you have the right answer by comparing with the
-%matlab command 'cov'.
-
-
-
-
+%calculate mean and covariance of data.

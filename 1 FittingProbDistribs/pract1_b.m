@@ -35,7 +35,7 @@ delta = 0;
 muML = sum(X) / N;
 sigmaML = sqrt(sum((X - muML).^2) / N);
 muMAP = (N * muML + gamma*delta)/(N+gamma);
-sigmaMAP = sqrt((sum((X-muMAP).^2) + 2*beta + gamma((delta-mu)^2)) / (N + 3 + 2*alpha));
+sigmaMAP = sqrt((sum((X-muMAP).^2) + 2*beta + gammad((delta-muMAP)^2)) / (N + 3 + 2*alpha));
  
 % TODO remove this break when you have completeed the first section
 
