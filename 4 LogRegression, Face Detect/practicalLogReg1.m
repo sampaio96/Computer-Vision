@@ -60,6 +60,14 @@ end;
 % TO DO: run your linesearch on this new training data, trying
 % different initializations.
 
+figure; set(gcf,'Color',[1 1 1]);
+plot(x,w,'r-');
+xlabel('x');ylabel('f(x)');
+ylim([-1.5 0.5]);
+hold on;
+plot(minX,minValue,'bo');
+
+% It is a local minimum.
 
 %==========================================================================
 
@@ -73,16 +81,14 @@ while((d-a)>tol)
     fprintf('Current Search Region is %6.6f to %6.6f\n',a,d);
     %TO DO:  calculate intermediate positions b and c, 1/3 and 2/3 of the way 
     % through interval (between a and d), respectively
+    b = a + (d-a)/3;
+    c = a + 2*(d-a)/3;
     
-    %replace this
-    break;
-    
-    
-    %TO DO evaluate function at points b and c
-    
-    
-    %TO DO:  update point a or d depending on the values of those evaluations
-    
+    if optFunction(b)>optFunction(c)
+        a = b;
+    else
+        d = c;
+    end
 end;
 
 %calculate value at minimum
@@ -109,7 +115,7 @@ end;
 function r= myFunction2(x)
 
 if (x<0)
-    r = -x-exp(-0.5*((-0.2)/0.025).^2);;
+    r = -x-exp(-0.5*((-0.2)/0.025).^2);
 elseif (x>1)
    r = -sin((1*1.8).^2)+x-1;
 else

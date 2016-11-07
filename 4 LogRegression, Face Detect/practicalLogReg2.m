@@ -66,8 +66,10 @@ while(1)
     %compute derivative and Hessian at current positions
     derivVector = myFunctionDeriv(startPosn);
     hessian = myFunction2ndDeriv(startPosn);
-    %compute update direction
+    %compute update direction (newton's method)
     updateDirection = -inv(hessian)*derivVector;
+    %compute update direction (steepest descent)
+    %updateDirection = -derivVector;
     %do line search
     endPosn = lineSearch(startPosn,updateDirection,myFunction,tol);
     %store the end position and the best value so far
@@ -116,8 +118,6 @@ x1 = x(1,:);
 x2 = x(2,:);
 r = 100*(x2-x1.^2).^2+(1-x1).^2;
 
-
-
 %==========================================================================
 function deriv= RosenbrockDeriv(x)
 %return partial derivatives of Rosenbrock function (a 2x1 vector)
@@ -126,6 +126,13 @@ function deriv= RosenbrockDeriv(x)
 %TO DO  - compute the first derivatives of Rosenbrock's function
 %Replace this:
 deriv = ones(2,1);
+deriv(1) = -400*x(1)*(x(2)-x(1).^2)-2*(-x(1)+1);
+deriv(2) = 200*(x(2)-x(1).^2);
+
+%Implementation for finite differences:
+% alpha = 10e-5;
+% deriv(1) = (Rosenbrock(x + alpha*[1;0])-Rosenbrock(x))/alpha;
+% deriv(2) = (Rosenbrock(x + alpha*[0;1])-Rosenbrock(x))/alpha;
 
 if ~(size(deriv, 1) == 2 && size(deriv, 2) == 1)
     error('deriv should be a 2 x 1 vector');
@@ -140,6 +147,10 @@ function hessian= Rosenbrock2ndDeriv(x)
 %TO DO  - compute the second derivatives of Rosenbrock's function
 %Replace this:
 hessian = eye(2,2);
+hessian(1,1) = -400*(x(2)-3*x(1)^2)+2;
+hessian(1,2) = -400*x(1);
+hessian(2,1) = -400*x(1);
+hessian(2,2) = 200;
 
 if ~(size(hessian, 1) == 2 && size(hessian, 2) == 2)
     error('hessian should be a 2 x 2 matrix');

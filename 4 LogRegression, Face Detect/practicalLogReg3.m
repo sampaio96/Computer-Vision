@@ -7,7 +7,7 @@ function r=practicalLogReg3
 %implement the first and second derivatives.
 
 %When you have this working, compare the number of iterations for steepest
-%descent vs. Newton's method
+%descent (~500) vs. Newton's method (5)
 
 %close all figures
 close all;
@@ -140,6 +140,8 @@ function deriv= NegLogProbDeriv(phi,x,w)
 %TO DO - compute this derivative.
 %replace this.
 deriv = ones(3,1);
+deriv  = x.*repmat(sig(phi'*x)-w,size(x,1),1);
+deriv = sum(deriv,2);
 
 if ~(size(deriv, 1) == 3 && size(deriv, 2) == 1)
     error('deriv should be a 3 x 1 vector');
@@ -152,6 +154,9 @@ function hessian= NegLogProbHessian(phi,x,w)
 %TO DO - compute this matrix.
 %Replace this:
 hessian = eye(3,3);
+weights = sig(phi'*x).*(1-sig(phi'*x));
+weightedX = x.*repmat(weights,size(x,1),1);
+hessian = -weightedX*x';
 
 if ~(size(hessian, 1) == 3 && size(hessian, 2) == 3)
     error('hessian should be a 3 x 3 matrix');

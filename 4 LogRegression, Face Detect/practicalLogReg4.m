@@ -5,9 +5,9 @@ function r=practicalLogReg4
 %This is a complete working bit of code. Your goals are to 
 %(i) Look at the code and understand it
 %(ii) Investigate what happens as you increase the amount of training data
-%- try 750, 1000, 1500,2000,2000,3000, 4000 examples.  Does it generalize better?
-%(iii) Try learning with gradient descent with 4000 examples. What happens?
-%(iii) Convert this to a non-linear logistic regression algorithm by
+%- try 750 (73.2%), 1000 (78.1%), 1500 (81.6%), 2000 (82.1%), 3000 (86.1%), 4000 (88.4%) examples.  Does it generalize better?
+%(iii) Try learning with gradient descent with 4000 examples. What happens? Orange is a face now.
+%(iv) Convert this to a non-linear logistic regression algorithm by
 %transforming the data before running the routine (don't forget to
 %transform the test data as well). Write a routine to transform each
 %data point to a 500x1  vector by evaluating it against 500 radial basis
@@ -24,7 +24,7 @@ rand('seed',2);
 %load in training data
 load('FaceDetectData.mat','x','y','xTest','yTest');
 %select the amount of training data
-nTrainData = 600;
+nTrainData = 500;
 x = x(:,:,1:nTrainData);
 y = y(1:nTrainData);
 %draw some of the data examples
@@ -40,7 +40,20 @@ for (cFig = 1:16);
 end;
 
 %vectorize data
-xVec = reshape(x,size(x,1)*size(x,2),size(x,3));
+xVec = reshape(x,size(x,1)*size(x,2),size(x,3)); % D*I
+
+%routine to convert xVec to z
+var = 10;
+means = xVec(:,1:500); % D(x)*500
+z = zeros(500,size(x,3)); % 500*I
+for i = 1:size(x,3)
+    for j = 1:500
+        % evaluate each dimension of z first, for jth training example
+        z(j,i) = exp(- (norm(xVec(:,i)-means(:,j)))^2 ./ (2*var));
+    end
+end
+xVec = z;
+
 %prepend ones
 xVec = [ones(1,size(xVec,2));xVec];
 %do optimization
@@ -58,7 +71,19 @@ fprintf('Training Data: Classified %3.3f percent correct\n',100*nCorrect/length(
 
 %compute for test data
 xTestVec = reshape(xTest,size(xTest,1)*size(xTest,2),size(xTest,3));
+
+means = xTestVec(:,1:500); % D(x)*500
+zTest = zeros(500,size(x,3)); % 500*I
+for i = 1:size(x,3)
+    for j = 1:500
+        % evaluate each dimension of z first, for jth training example
+        zTest(j,i) = exp(- (norm(xTestVec(:,i)-means(:,j)))^2 ./ (2*var));
+    end
+end
+xTestVec = zTest;
+
 xTestVec = [ones(1,size(xTestVec,2));xTestVec];
+
 %get summary statistics
 prob = sig(phi'*xTestVec);
 class = prob>0.5;
