@@ -53,9 +53,6 @@ nGaussEst = 2;
 figure;
 mixGaussEst = fitMixGauss1d(data,nGaussEst);
 
-
-
-
 %==========================================================================
 %==========================================================================
 
@@ -66,12 +63,12 @@ function data = mixGaussGen1d(mixGauss,nData);
 %create space for output data
 data = zeros(1,nData);
 %for each data point
-for (cData =1:nData)
+for (cData = 1:nData)
     %randomly choose Gaussian according to probability distributions
-    h = sampleFromDiscrete(mixGauss.weight);
+    h = sampleFromDiscrete(mixGauss.weight); % choose 1 or 2
     %draw a sample from the appropriate Gaussian distribution
-    %TO DO (d)- replace this
-    data(:,cData) = randn(1);
+    %TO DO (d)
+    data(:,cData) = sqrt(mixGauss.cov(:,:,h)) * randn(1) + mixGauss.mean(h);
 end;
     
 %==========================================================================
@@ -117,9 +114,12 @@ for (cIter = 1:nIter)
         %this data point came from each of the Gaussians
         %replace this:
         ll = zeros(1,k);
+        thisdata = data(:,cData);
         for cGauss=1:k
-            ll(cGauss) = mixGaussEst.weight(cGauss) * mvnpdf(data(:,cData),mixGaussEst.mean(cGauss),mixGaussEst.cov(cGauss));
+            ll(cGauss) = mixGaussEst.weight(cGauss) * 1/((2*pi)^(mixGaussEst.d/2)*(norm(mixGaussEst.cov(:,:,cGauss)))^(1/2))*exp(-0.5*((thisdata-mixGaussEst.mean(cGauss)).')*inv(mixGaussEst.cov(:,:,cGauss))*(thisdata-mixGaussEst.mean(cGauss)));
+            % mixGaussEst.weight(cGauss) * mvnpdf(data(:,cData),mixGaussEst.mean(cGauss),mixGaussEst.cov(cGauss));
         end
+        
         for cGauss=1:k
             responsibilities(cGauss,cData) = ll(cGauss) ./ sum(ll);
         end
@@ -141,22 +141,25 @@ for (cIter = 1:nIter)
    for (cGauss = 1:k) 
         %TO DO:  Update weighting parameters mixGauss.weight based on the total
         %posterior probability associated with each Gaussian. Replace this:
-        mixGaussEst.weight(cGauss) = sum(responsibilities(cGauss,:))/sum(sum(responsibilities)); 
+        sumIr = sum(responsibilities(cGauss,:));
+        
+        mixGaussEst.weight(cGauss) = sumIr/sum(sum(responsibilities(:,:)));
    
         %TO DO:  Update mean parameters mixGauss.mean by weighted average
         %where weights are given by posterior probability associated with
         %Gaussian.  Replace this:
-        dim = size(data, 1);
-        jj = zeros(dim, nData);
-        for (cData = 1:nData)
-            jj(:,cData) = responsibilities(cGauss,cData).' * data(:,cData);
-        end
-        mixGaussEst.mean(cGauss) = sum(jj) ./ sum(responsibilities(cGauss,:));
+        ji = responsibilities(cGauss,:) .* data(:,:);
+        mixGaussEst.mean(cGauss) = sum(ji) ./ sumIr;
         
-        %TO DO:  Update covarance parameter based on weighted average of
+        %TO DO:  Update covariance parameter based on weighted average of
         %square distance from update mean, where weights are given by
         %posterior probability associated with Gaussian
-        mixGaussEst.cov(1,1,cGauss) = sum ( responsibilities(cGauss,:) * ( (data(:,cData) - mixGaussEst.mean(cGauss))  * (data(:,cData) - mixGaussEst.mean(cGauss)).'  ));
+        jj = data - mixGaussEst.mean(:,cGauss);
+        jk = zeros(1,1,nData);
+        for i=1:nData
+            jk(1,1,i) = jj(1,i) * jj(1,i).' * responsibilities(cGauss,i);
+        end
+        mixGaussEst.cov(1,1,cGauss) = sum(jk,3) ./ sumIr;
    end;
    
    %draw the new solution
@@ -171,6 +174,9 @@ for (cIter = 1:nIter)
    fprintf('Bound After M-Step Iter %d : %4.3f\n',cIter,bound);   
 end;
 
+mixGaussEst.mean
+mixGaussEst.weight
+mixGaussEst.cov
 
 %==========================================================================
 %==========================================================================
@@ -193,8 +199,12 @@ for(cData = 1:nData)
     %TO DO (e) - calculate likelihood of this data point under mixture of
     %Gaussians model. Replace this
     
-    D = length(thisData);
-    like = 1/((2*pi)^(D/2)*(norm(mixGaussEst.cov))^(1/2))*exp(-0.5*((thisdata-mixGaussEst.mean).')*inv(mixGaussEst.cov)*(thisdata-mixGaussEst.mean));
+    nDim = length(thisData);
+    % assert(eq(nDim,mixGaussEst.d));
+    like = 0;
+    for(cGauss = 1:mixGaussEst.k)
+        like = like + mixGaussEst.weight(cGauss) * 1/((2*pi)^(nDim/2)*(norm(mixGaussEst.cov(:,:,cGauss)))^(1/2)) * exp(-0.5*((thisData-mixGaussEst.mean(cGauss)).')*inv(mixGaussEst.cov(:,:,cGauss))*(thisData-mixGaussEst.mean(cGauss)));
+    end
     
     %add to total log like
     logLike = logLike+log(like);        
@@ -220,17 +230,19 @@ for(cData = 1:nData)
     %extract this q(h)
     thisQ = responsibilities(:,cData);
     
+    nDim = length(thisData);
+    assert(eq(nDim,mixGaussEst.d));
+    
     %TO DO - calculate contribution to bound of this datapoint
     %Replace this
-    boundValue= 0;
+    boundValue = 0;    
+    for(cGauss = 1:mixGaussEst.k)
+        boundValue = boundValue + thisQ(cGauss) * log ( (mixGaussEst.weight(cGauss) * 1/((2*pi)^(nDim/2)*(norm(mixGaussEst.cov(:,:,cGauss)))^(1/2)) * exp(-0.5*((thisData-mixGaussEst.mean(cGauss)).')*inv(mixGaussEst.cov(:,:,cGauss))*(thisData-mixGaussEst.mean(cGauss)))) / thisQ(cGauss));
+    end
     
     %add to total log like
-    bound = bound+boundValue;        
+    bound = bound+boundValue;
 end;
-
-
-
-
 
 %==========================================================================
 %==========================================================================

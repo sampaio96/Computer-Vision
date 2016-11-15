@@ -45,9 +45,6 @@ nGaussEst = 3;
 figure;
 mixGaussEst = fitMixGauss(data,nGaussEst);
 
-
-
-
 %==========================================================================
 %==========================================================================
 
@@ -58,15 +55,14 @@ function data = mixGaussGen(mixGauss,nData);
 %create space for output data
 data = zeros(mixGauss.d,nData);
 %for each data point
-for (cData =1:nData)
+for (cData = 1:nData)
     %randomly choose Gaussian according to probability distributions
     h = sampleFromDiscrete(mixGauss.weight);
     %draw a sample from the appropriate Gaussian distribution
     %first sample from the covariance matrix (google how to do this - it
     %will involve the Matlab command 'chol').  Then add the mean vector
     %TO DO (f)- replace this
-    data(:,cData) = randn(mixGauss.d,1);
-   
+    data(:,cData) = (mixGauss.mean(:,h).' + randn(1,mixGauss.d) * chol(mixGauss.cov(:,:,h))).';
 end;
     
 %==========================================================================
@@ -111,7 +107,15 @@ for (cIter = 1:nIter)
         %TO DO (g): fill in column of 'hidden' - calculate posterior probability that
         %this data point came from each of the Gaussians
         %replace this:
-        postHidden(:,cData) = 1/k;
+        ll = zeros(1,k);
+        thisdata = data(:,cData);
+        for cGauss=1:k
+            ll(cGauss) = mixGaussEst.weight(cGauss) * 1/((2*pi)^(mixGaussEst.d/2)*(norm(mixGaussEst.cov(:,:,cGauss)))^(1/2))*exp(-0.5*((thisdata-mixGaussEst.mean(:,cGauss)).')*inv(mixGaussEst.cov(:,:,cGauss))*(thisdata-mixGaussEst.mean(:,cGauss)));
+        end
+        
+        for cGauss=1:k
+            postHidden(cGauss,cData) = ll(cGauss) ./ sum(ll);
+        end
    end;
    
    %Maximization Step
@@ -120,17 +124,25 @@ for (cIter = 1:nIter)
    for (cGauss = 1:k) 
         %TO DO (h):  Update weighting parameters mixGauss.weight based on the total
         %posterior probability associated with each Gaussian. Replace this:
-        mixGaussEst.weight(cGauss) = mixGaussEst.weight(cGauss); 
+        sumIr = sum(postHidden(cGauss,:));
+        
+        mixGaussEst.weight(cGauss) = sumIr/sum(sum(postHidden(:,:)));
    
         %TO DO (i):  Update mean parameters mixGauss.mean by weighted average
         %where weights are given by posterior probability associated with
         %Gaussian.  Replace this:
-        mixGaussEst.mean(cGauss) = mixGaussEst.mean(cGauss);
+        ji = data(:,:) .* postHidden(cGauss,:);
+        mixGaussEst.mean(:,cGauss) = sum(ji,2) ./ sumIr;
         
-        %TO DO (j):  Update covarance parameter based on weighted average of
+        %TO DO (j):  Update covariance parameter based on weighted average of
         %square distance from update mean, where weights are given by
         %posterior probability associated with Gaussian
-        mixGaussEst.cov(:,:,cGauss) = mixGaussEst.cov(:,:,cGauss);
+        jj = data - mixGaussEst.mean(:,cGauss);
+        jk = zeros(nDim,nDim,nData);
+        for i=1:nData
+            jk(:,:,i) = jj(:,i) * jj(:,i).' .* postHidden(cGauss,i);
+        end
+        mixGaussEst.cov(:,:,cGauss) = sum(jk,3) ./ sumIr;
    end;
    
    %draw the new solution
@@ -161,9 +173,13 @@ logLike = 0;
 %run through each data item
 for(cData = 1:nData)
     thisData = data(:,cData);    
+    nDim = length(thisData);
     %TO DO - calculate likelihood of this data point under mixture of
     %Gaussians model. Replace this
-    like = 1;
+    like = 0;
+    for(cGauss = 1:mixGaussEst.k)
+        like = like + mixGaussEst.weight(cGauss) * 1/((2*pi)^(nDim/2)*(norm(mixGaussEst.cov(:,:,cGauss)))^(1/2)) * exp(-0.5*((thisData-mixGaussEst.mean(cGauss)).')*inv(mixGaussEst.cov(:,:,cGauss))*(thisData-mixGaussEst.mean(cGauss)));
+    end
     
     %add to total log like
     logLike = logLike+log(like);        

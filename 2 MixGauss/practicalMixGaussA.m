@@ -67,7 +67,9 @@ for (cY = 1:imY);
         likeNonSkin = calcGaussianProb(thisPixelData,meanNonSkin,covNonSkin);
         %TO DO (c):  calculate posterior probability from likelihoods and 
         %priors using BAYES rule. Replace this: 
-        posteriorSkin(cY,cX) = 0.5;
+        num = likeSkin*priorSkin;
+        den = num + likeNonSkin*priorNonSkin;
+        posteriorSkin(cY,cX) = num/den;
     end;
 end;
 
@@ -86,7 +88,6 @@ subplot(1,3,3); imagesc(posteriorSkin, clims); colormap(gray); axis off; axis im
 function like = calcGaussianProb(data,gaussMean,gaussCov)
 
 %TO DO (b) - fill in this routine
-%replace this
 D = length(data);
 like = 1/((2*pi)^(D/2)*(norm(gaussCov))^(1/2))*exp(-0.5*((data-gaussMean).')*inv(gaussCov)*(data-gaussMean));
 
@@ -94,7 +95,7 @@ like = 1/((2*pi)^(D/2)*(norm(gaussCov))^(1/2))*exp(-0.5*((data-gaussMean).')*inv
 %==========================================================================
 
 %the goal of this routine is to return the mean and covariance of a set of
-%multidimensaional data.  It is assumed that each column of the 2D array
+%multidimensional data.  It is assumed that each column of the 2D array
 %data contains a single data point.  The mean vector should be a 3x1 vector
 %with the mean RGB value.  The covariance should be a 3x3 covariance
 %matrix. See the note at the top, which explains that using mean() is ok,
@@ -104,23 +105,13 @@ function [meanData covData] = fitGaussianModel(data)
 [nDim nData] = size(data);
 
 %TO DO (a): replace this
-meanData = mean(data.').';
-covData = cov(data.');
-% covDatas = zeros(nDim);
-% covCalculated = zeros(nDim);
-% for a = 1:nDim
-%     for b = 1:nDim
-%         if covCalculated(b,a)
-%             covDatas(a,b) = covDatas(b,a);
-%         else
-%             covDatas(a,b) = (data(:,a)-mean(a)).' * (data(:,b)-mean(b));
-%         end
-%     end
-% end
-% if (nDim ~= 1)
-%     covDatas = covDatas ./ (nDim-1);
-% end
-% differencemx = zeros(3);
-% differencemx = covData - covDatas + 100
+meanData = mean(data.').'; % mean of each column gives out a 3D mean
 
-%calculate mean and covariance of data.
+xs = data - meanData;
+covData = xs * xs';
+covData = covData/(nData-1);
+
+assert(isequal(size(meanData),[3 1]));
+assert(isequal(size(covData),[3 3]));
+% assert(isequal(covData,cov(data.'))); % is fine, but doesn't need to be
+% computed each time
