@@ -56,10 +56,13 @@ for s=1:length(sigmaRange)
     end
 end
 % TODO - Estimate the posterior
-posterior = zeros(size(prior));
 posterior = lfun.*prior;
+
 % TODO 3 - Empirically compare the closed form posterior to the product of
 % likelihood and prior from Part b
+
+% Same distribution.
+
 % TODO 4 - Show that peak of this distribution again corresponds to the MAP
 % solution
  

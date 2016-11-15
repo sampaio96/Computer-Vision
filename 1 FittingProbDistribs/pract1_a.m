@@ -90,5 +90,5 @@ legend('peak', 'ml estimate', 'input');
  
  
 % TODO 5 - Observe what happens to the likelihood function as you increase the number of datapoints
- 
+% Gets very homogeneous across all mu and sigmaSq
  

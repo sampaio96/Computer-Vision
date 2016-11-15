@@ -34,8 +34,8 @@ delta = 0;
 % equations below
 muML = sum(X) / N;
 sigmaML = sqrt(sum((X - muML).^2) / N);
-muMAP = (N * muML + gamma*delta)/(N+gamma);
-sigmaMAP = sqrt((sum((X-muMAP).^2) + 2*beta + gammad((delta-muMAP)^2)) / (N + 3 + 2*alpha));
+muMAP = (sum(X) + gamma*delta)/(N+gamma);
+sigmaMAP = sqrt((sum((X-muMAP).^2) + 2*beta + gamma*((delta-muMAP)^2)) / (N + 3 + 2*alpha));
  
 % TODO remove this break when you have completeed the first section
 
@@ -95,6 +95,8 @@ axis off
 % TODO 6 - Comment on the effects of introducing the prior as the number of
 % datapoints is low as compared to high
  
- 
+% The prior is very far from the actual implemented means, so it is having
+% a strong effect in the posterior. With more datapoints, it wouldn't have
+% such an effect.
 
 
