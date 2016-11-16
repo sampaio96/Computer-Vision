@@ -174,10 +174,6 @@ for (cIter = 1:nIter)
    fprintf('Bound After M-Step Iter %d : %4.3f\n',cIter,bound);   
 end;
 
-mixGaussEst.mean
-mixGaussEst.weight
-mixGaussEst.cov
-
 %==========================================================================
 %==========================================================================
 

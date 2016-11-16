@@ -37,7 +37,6 @@ drawnow;
 %Each column contains RGB values from one pixel in training data
 load('RGBSkinNonSkin','RGBSkin','RGBNonSkin');
 
-
 %fit Gaussian model for skin data
 %TO DO - fill in this routine (it's below, at the bottom of this file)
 [meanSkin covSkin] = fitGaussianModel(RGBSkin);
