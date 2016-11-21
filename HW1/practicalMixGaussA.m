@@ -16,30 +16,29 @@ subplot(1,3,2); imagesc(gt); colormap(gray); axis off; axis image;
 drawnow;
 
 %fit Gaussian model for apple data
-mixGaussApple = fitMixGauss(RGBApple(:,randi([1 size(RGBApple,2)],1,10000)),10);
+mixGaussApple = fitMixGauss(RGBApple(:,randi([1 size(RGBApple,2)],1,10000)),5);
 
 %fit Gaussian model for non-apple data
-mixGaussNonApple = fitMixGauss(RGBNonApple(:,randi([1 size(RGBNonApple,2)],1,10000)),20);
+mixGaussNonApple = fitMixGauss(RGBNonApple(:,randi([1 size(RGBNonApple,2)],1,10000)),5);
 
 [imY imX imZ] = size(im);
-data = double(reshape(im,imY*imX,imZ).') / 255;
+data = double(reshape(im,imY*imX,imZ).') / 255; %3*(w*h)
 
 %determine posterior for each pixel being apple
-[imY imX imZ] = size(im);
 
 posteriorApple = zeros(imY,imX);
 for (cY = 1:imY); 
     fprintf('Processing Row %d\n',cY);     
     for (cX = 1:imX);          
         %extract this pixel data
-        thisPixelData = squeeze(double(im(cY,cX,:)));
+        thisPixelData = data(:,(cX-1)*imY+cY);
         %calculate likelihood of this data given apple model
         likeApple = calcGaussianProb(thisPixelData,mixGaussApple);
         %calculate likelihood of this data given non-apple model
         likeNonApple = calcGaussianProb(thisPixelData,mixGaussNonApple);
         %calculate posterior probability
-        num = likeApple*0.3;
-        den = num + likeNonApple*0.7;
+        num = likeApple*0.5;
+        den = num + likeNonApple*0.5;
         posteriorApple(cY,cX) = num/den;
     end;
 end;
@@ -135,71 +134,71 @@ end
 
 function mixGaussEst = fitMixGauss(data,k)
 
-[nDim nData] = size(data);
-mixGaussEst.d = nDim;
-mixGaussEst.k = k;
-mixGaussEst.weight = (1/k)*ones(1,k);
-mixGaussEst.mean = 2*randn(nDim,k);
-for (cGauss =1:k)
-    mixGaussEst.cov(:,:,cGauss) = (0.5+1.5*rand(1))*eye(nDim,nDim);
-end;
+    [nDim nData] = size(data);
+    mixGaussEst.d = nDim;
+    mixGaussEst.k = k;
+    mixGaussEst.weight = (1/k)*ones(1,k);
+    mixGaussEst.mean = 2*randn(nDim,k);
+    for (cGauss =1:k)
+        mixGaussEst.cov(:,:,cGauss) = (0.5+1.5*rand(1))*eye(nDim,nDim);
+    end;
 
-%calculate current likelihood and bound
-logLike = getMixGaussLogLike(data,mixGaussEst);
-fprintf('Log Likelihood Iter 0 : %4.3f\n',logLike);
+    %calculate current likelihood and bound
+    logLike = getMixGaussLogLike(data,mixGaussEst);
+    fprintf('Log Likelihood Iter 0 : %4.3f\n',logLike);
 
-nIter = 5; % updates weights, and means and cov too to increase likelihood
-for (cIter = 1:nIter)
+    nIter = 5; % updates weights, and means and cov too to increase likelihood
+    for (cIter = 1:nIter)
 
-% Expectation step
-xx = reshape(data,3,1,nData);
-% assert(isequal(size(xx),[nDim 1 nData]));
-xx = repmat(xx,1,k,1);
-% assert(isequal(size(xx),[nDim k nData]));
-xx = xx - mixGaussEst.mean;
-% assert(isequal(size(mixGaussEst.mean),[nDim k]));  
-% assert(isequal(size(xx),[nDim k nData]));
-xx = mat2cell(xx, nDim, k, ones(1,nData));
-% assert(isequal(size(xx{1}),[nDim k]));
+    % Expectation step
+    xx = reshape(data,3,1,nData);
+    % assert(isequal(size(xx),[nDim 1 nData]));
+    xx = repmat(xx,1,k,1);
+    % assert(isequal(size(xx),[nDim k nData]));
+    xx = xx - mixGaussEst.mean;
+    % assert(isequal(size(mixGaussEst.mean),[nDim k]));  
+    % assert(isequal(size(xx),[nDim k nData]));
+    xx = mat2cell(xx, nDim, k, ones(1,nData));
+    % assert(isequal(size(xx{1}),[nDim k]));
 
-ol = cellfun(@ (A) (arrayfun((@ (cGauss) (A(:,cGauss)' * mixGaussEst.cov(:,:,cGauss) * A(:,cGauss))), (1:mixGaussEst.k))),xx,'un',0);
-% assert(isequal(size(ol{1}),[1 k]));
-ol = cellfun(@ (A) (-0.5 * exp(A)), ol,'un',0);
-% assert(isequal(size(ol{1}),[1 k]));
-oj = arrayfun((@ (cGauss) (mixGaussEst.weight(1) / ((2*pi)^(nDim/2) * norm(mixGaussEst.cov(1))^(1/2)))), (1:mixGaussEst.k));
-% assert(isequal(size(oj),[1 k]));
-ol = cellfun(@ (A) (oj .* A), ol,'un',0);
-% assert(isequal(size(ol{1}),[1 k]));
+    ol = cellfun(@ (A) (arrayfun((@ (cGauss) (A(:,cGauss)' * mixGaussEst.cov(:,:,cGauss) * A(:,cGauss))), (1:mixGaussEst.k))),xx,'un',0);
+    % assert(isequal(size(ol{1}),[1 k]));
+    ol = cellfun(@ (A) (-0.5 * exp(A)), ol,'un',0);
+    % assert(isequal(size(ol{1}),[1 k]));
+    oj = arrayfun((@ (cGauss) (mixGaussEst.weight(1) / ((2*pi)^(nDim/2) * norm(mixGaussEst.cov(1))^(1/2)))), (1:mixGaussEst.k));
+    % assert(isequal(size(oj),[1 k]));
+    ol = cellfun(@ (A) (oj .* A), ol,'un',0);
+    % assert(isequal(size(ol{1}),[1 k]));
 
-oi = reshape(cell2mat(ol),mixGaussEst.k,nData);
-% assert(isequal(size(oi),[k nData]));
-postHidden = oi ./ sum(oi);
-% assert(isequal(size(postHidden),[k nData]))
+    oi = reshape(cell2mat(ol),mixGaussEst.k,nData);
+    % assert(isequal(size(oi),[k nData]));
+    postHidden = oi ./ sum(oi);
+    % assert(isequal(size(postHidden),[k nData]))
 
-% Maximization Step
+    % Maximization Step
 
-%for each constituent Gaussian
-sumr = sum(sum(postHidden(:,:)));
-for (cGauss = 1:k) 
-    sumIr = sum(postHidden(cGauss,:));
+    %for each constituent Gaussian
+    sumr = sum(sum(postHidden(:,:)));
+    for (cGauss = 1:k) 
+        sumIr = sum(postHidden(cGauss,:));
 
-    mixGaussEst.weight(cGauss) = sumIr/sumr;
+        mixGaussEst.weight(cGauss) = sumIr/sumr;
 
-    ji = data(:,:) .* postHidden(cGauss,:);
-    mixGaussEst.mean(:,cGauss) = sum(ji,2) ./ sumIr;
+        ji = data(:,:) .* postHidden(cGauss,:);
+        mixGaussEst.mean(:,cGauss) = sum(ji,2) ./ sumIr;
 
-    jj = data - mixGaussEst.mean(:,cGauss);
-    % assert(isequal(size(jj),[nDim 1]));
-    jk = mat2cell(reshape(jj,mixGaussEst.d,1,nData), nDim, 1, ones(1,nData));
-    jk = cellfun(@ (A) (A * A'), jk,'un',0);
-    jk = reshape(cell2mat(jk),nDim,nDim,nData) .* reshape(postHidden(cGauss,:),1,1,nData);
-    mixGaussEst.cov(:,:,cGauss) = sum(jk,3) ./ sumIr;
-end;
+        jj = data - mixGaussEst.mean(:,cGauss);
+        % assert(isequal(size(jj),[nDim 1]));
+        jk = mat2cell(reshape(jj,mixGaussEst.d,1,nData), nDim, 1, ones(1,nData));
+        jk = cellfun(@ (A) (A * A'), jk,'un',0);
+        jk = reshape(cell2mat(jk),nDim,nDim,nData) .* reshape(postHidden(cGauss,:),1,1,nData);
+        mixGaussEst.cov(:,:,cGauss) = sum(jk,3) ./ sumIr;
+    end;
 
-%calculate the log likelihood
-logLike = getMixGaussLogLike(data,mixGaussEst);
-fprintf('Log Likelihood Iter %d : %4.3f\n',cIter,logLike);
+    %calculate the log likelihood
+    logLike = getMixGaussLogLike(data,mixGaussEst);
+    fprintf('Log Likelihood Iter %d : %4.3f\n',cIter,logLike);
 
-% bound = getBound(data,mixGaussEst,postHidden);
-% fprintf('Bound Iter %d : %4.3f\n',cIter,bound);
+    % bound = getBound(data,mixGaussEst,postHidden);
+    % fprintf('Bound Iter %d : %4.3f\n',cIter,bound);
 end;

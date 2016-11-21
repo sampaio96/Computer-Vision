@@ -1,0 +1,20 @@
+n = 8;
+Iapples = cell(n,1);
+Iapples{1} = 'apples/more-apples.jpg';
+Iapples{2} = 'apples/red-apples.jpg';
+Iapples{3} = 'apples/bobbing-for-apples.jpg';
+Iapples{4} = 'testApples/Bbr98ad4z0A-ctgXo3gdwu8-original.jpg';
+Iapples{5} = 'apples/Apples_by_kightp_Pat_Knight_flickr.jpg';
+Iapples{6} = 'apples/ApplesAndPears_by_srqpix_ClydeRobinson.jpg';
+Iapples{7} = 'testApples/Apples_by_MSR_MikeRyan_flickr.jpg';
+Iapples{8} = 'testApples/audioworm-QKUJj2wmxuI-original.jpg';
+
+IapplesMasks = cell(n,1);
+IapplesMasks{1} = 'apples/more-apples.png';
+IapplesMasks{2} = 'apples/red-apples.png';
+IapplesMasks{3} = 'apples/bobbing-for-apples.png';
+IapplesMasks{4} = 'testApples/Bbr98ad4z0A-ctgXo3gdwu8-original.png';
+IapplesMasks{5} = 'apples/Apples_by_kightp_Pat_Knight_flickr.png';
+IapplesMasks{6} = 'apples/ApplesAndPears_by_srqpix_ClydeRobinson.png';
+IapplesMasks{7} = 'testApples/Apples_by_MSR_MikeRyan_flickr.png';
+IapplesMasks{8} = 'testApples/audioworm-QKUJj2wmxuI-original.png';
