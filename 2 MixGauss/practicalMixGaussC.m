@@ -101,6 +101,7 @@ fprintf('Log Likelihood Iter 0 : %4.3f\n',logLike);
 
 nIter = 20;
 for (cIter = 1:nIter)
+    broken = 0;
    %Expectation step
    
    for (cData = 1:nData)
@@ -127,7 +128,11 @@ for (cIter = 1:nIter)
         sumIr = sum(postHidden(cGauss,:));
         
         mixGaussEst.weight(cGauss) = sumIr/sum(sum(postHidden(:,:)));
-   
+        if mixGaussEst.weight(cGauss) < 0.01
+            broken = 1;
+            break
+        end
+        
         %TO DO (i):  Update mean parameters mixGauss.mean by weighted average
         %where weights are given by posterior probability associated with
         %Gaussian.  Replace this:
@@ -144,6 +149,9 @@ for (cIter = 1:nIter)
         end
         mixGaussEst.cov(:,:,cGauss) = sum(jk,3) ./ sumIr;
    end;
+   if (broken == 1)
+       break;
+   end
    
    %draw the new solution
    drawEMData2d(data,mixGaussEst);drawnow;
@@ -151,10 +159,10 @@ for (cIter = 1:nIter)
    %calculate the log likelihood
    logLike = getMixGaussLogLike(data,mixGaussEst);
    fprintf('Log Likelihood Iter %d : %4.3f\n',cIter,logLike);
-
 end;
-
-
+if (broken == 1)
+    mixGaussEst = fitMixGauss(data,k);
+end
 %==========================================================================
 %==========================================================================
 
