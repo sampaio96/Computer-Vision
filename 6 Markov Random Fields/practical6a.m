@@ -34,7 +34,7 @@ for(w1 = 0:1)
                     %compute unnormalized probability
                     %use the routine getPhi (it's below, also needs completion)
                     %replace this:
-                    prW(wIndex) = getPhi(w1,w2)*getPhi(w2,w3)*getPhi(w3,w4)*getPhi(w4,w5);%*getPhi(w5,w1);
+                    prW(wIndex) = getPhi(w1,w2)*getPhi(w2,w3)*getPhi(w3,w4)*getPhi(w4,w5)*getPhi(w5,w1); %Last link wasn't here before.
                     %store binary values
                     binaryValues(wIndex,:) = [w1 w2 w3 w4 w5];
                     %update index
@@ -63,9 +63,7 @@ end;
 %TO DO
 % Some combinations may appear to have zero probability, when it's really 
 % higher probability than zero. Fix the above print statement to make this
-% clearer.
-
-
+% clearer. (showing probabilities in scientific notation).
 
 % TO DO: fix sampleFromDiscrete() below.
 %draw 10 samples from this probability distribution
@@ -79,7 +77,7 @@ end;
 %
 % TO DO: 
 % Now change the graphical model and run the above algorithm again: add an
-% undirected edge between w5 and w1.
+% undirected edge between w5 and w1. (Implemented)
 
 %==========================================================================
 %==========================================================================
