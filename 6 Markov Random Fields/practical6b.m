@@ -23,7 +23,7 @@ position = [0;0];
 plot(position(1),position(2),'b.','MarkerSize',5);
 
 %define number of samples
-nSample = 10;
+nSample = 1000;
 
 %loop over number of samples
 for (cSample = 1:nSample)
