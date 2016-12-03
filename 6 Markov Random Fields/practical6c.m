@@ -54,7 +54,7 @@ for (cIter = 1:nIter)
         %TO DO  Generate a random number between 0 and 1. If it is
         %less than prLabelEquals0, then set the label to zero, otherwise set
         %it to one. Replace this:
-        label(thisY,thisX) = double(rand(1)<prLabelEquals0);
+        label(thisY,thisX) = double(rand(1)>prLabelEquals0);
     
         %draw image 
         imagesc(label); axis off; axis image; drawnow;   
@@ -68,7 +68,7 @@ end;
 %TO DO:  Now look at the computation - almost all of the terms that you compute
 %are the same for both prLabelEquals1 and prLabelequals0 and hence they
 %cancel when you normalize.  How would you re-implement this so that you
-%did not do all of this unnecessary compution?
+%did not do all of this unnecessary computation?
 
     
 %==========================================================================
@@ -88,26 +88,13 @@ Z = zeros(imY, imX);
 %for each pixel
 for(cPixelY = 1:imY)
     for (cPixelX = 1:imX)
-        %add cost for neighbour above this pixel
-        %TO DO - fill in routine get cost
-        if(cPixelY>1)
-            U = U + getCost(label(cPixelY,cPixelX),label(cPixelY-1,cPixelX),MRFCosts);
-            Z(cPixelY, cPixelX) = Z(cPixelY, cPixelX) + getCost(label(cPixelY,cPixelX),label(cPixelY-1,cPixelX),MRFCosts);
-        end;
         %add cost for neighbour below this pixel
         if(cPixelY<imY)
             U = U + getCost(label(cPixelY,cPixelX),label(cPixelY+1,cPixelX),MRFCosts);
-            Z(cPixelY, cPixelX) = Z(cPixelY, cPixelX) + getCost(label(cPixelY,cPixelX),label(cPixelY+1,cPixelX),MRFCosts);
-        end;
-        %add cost for neighbour to the left
-        if(cPixelX>1)
-            U = U + getCost(label(cPixelY,cPixelX),label(cPixelY,cPixelX-1),MRFCosts);
-            Z(cPixelY, cPixelX) = Z(cPixelY, cPixelX) + getCost(label(cPixelY,cPixelX),label(cPixelY,cPixelX-1),MRFCosts);
         end;
         %add cost for neighbour to the right(!!!) this pixel
         if(cPixelX<imX)
             U = U + getCost(label(cPixelY,cPixelX),label(cPixelY,cPixelX+1),MRFCosts);
-            Z(cPixelY, cPixelX) = Z(cPixelY, cPixelX) + getCost(label(cPixelY,cPixelX),label(cPixelY,cPixelX+1),MRFCosts);
         end;
     end;
 end;
@@ -123,10 +110,3 @@ prMRF = exp(-U)/Z;
 function cost = getCost(label1,label2,MRFCosts)
 %TO DO - fill in this routine - Replace this
 cost = -log(MRFCosts(label1+1, label2+1));
-
-    
-    
-    
-    
-    
-    
