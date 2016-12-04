@@ -25,11 +25,11 @@ unaryCosts = [2.0 1.1 5.7 1.5 6.0 3.1 ;...
 
 %define pairwise costs:  pairwiseCosts(a,b) represents the cost for changing from 
 %disparity level A at pixel j to disparity level B at pixel j+1;
-pairwiseCosts = [   0   2 100 100 100;...
-                2   0   2 100 100;...
-              100   2   0   2 100;...
-              100 100   2   0   2;...
-              100 100 100   2   0];
+pairwiseCosts = [   0   2   100 100 100;...
+                    2   0   2   100 100;...
+                    100 2   0   2   100;...
+                    100 100 2   0   2;...
+                    100 100 100 2   0];
           
 %Now, use dynamic programming to find best solution.
 %TO DO - fill in this routine (further down in this file).
@@ -54,80 +54,3 @@ bestPathCostUnary = sum(unaryCosts(bestPath+(0:nX-1)*nY));
 bestPathCostPairwise = sum(pairwiseCosts(bestPath(1:end-1)+nY*(bestPath(2:end)-1)));
 bestCost = bestPathCostUnary+bestPathCostPairwise;
 fprintf('Path Cost = %3.3f\n',bestCost);
-
-
-%==========================================================================
-%==========================================================================
-
-%the goal of this routine is to return the minimum cost dynamic programming
-%solution given a set of unary and pairwise costs
-function bestPath = dynamicProgram(unaryCosts, pairwiseCosts)
-
-
-%count number of positions (i.e. pixels in the scanline), and nodes at each
-%position (i.e. the number of distinct possible disparities at each position)
-[nNodesPerPosition nPosition] = size(unaryCosts);
-
-%define minimum cost matrix - each element will eventually contain
-%the minimum cost to reach this node from the left hand side.
-%We will update it as we move from left to right
-minimumCost = zeros(nNodesPerPosition, nPosition);
-
-%define parent matrix - each element will contain the (vertical) index of
-%the node that preceded it on the path.  Since the first column has no
-%parents, we will leave it set to zeros.
-parents = zeros(nNodesPerPosition, nPosition);
-
-%FORWARD PASS
-
-%TO DO:  fill in first column of minimum cost matrix
-
-
-%Now run through each position (column)
-for (cPosition = 2:nPosition)
-    %run through each node (element of column)
-    for (cNode = 1:nNodesPerPosition)
-        %now we find the costs of all paths from the previous column to this node
-        possPathCosts = zeros(nNodesPerPosition,1);
-        for (cPrevNode = 1:nNodesPerPosition)
-            %TO DO  - fill in elements of possPathCosts
-            
-        end;
-        %TO DO - find the minimum of the possible paths 
-        
-        %TO DO - store the minimum cost in the minimumCost matrix
-        
-        %TO DO - store the parent index in the parents matrix
-        
-    end;
-end;
-
-
-%BACKWARD PASS
-
-%we will now fill in the bestPath vector
-bestPath = zeros(1,nPosition);
-
-%TO DO  - find the index of the overall minimum cost from the last column and put this
-%into the last entry of best path
-
-%TO DO - find the parent of the node you just found
-
-
-%run backwards through the cost matrix tracing the best patch
-for (cPosition = nPosition-1:-1:1)
-    %TO DO - work through matrix backwards, updating bestPath by tracing
-    %parents.
-    
-    
-end
-
-
-%TO DO: REMOVE THIS WHEN YOU ARE DONE
-bestPath = ceil(rand(1,nPosition)*nNodesPerPosition);
-
-
-
-
-
-

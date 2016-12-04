@@ -54,13 +54,13 @@ for (cY = 1:imY)
             %negative log likelihood, where the likelihood is a Gaussian
             %with a mean of the value (i.e. intensity) at the offset pixel 
             %in image2 and a standard deviation of "noiseSD". 
-            
+            unaryCosts(cDisp,cX) = -log(1/sqrt(2*noiseSD^2*pi) * exp(-(im1(cY,cX)-im2(cY,cX+cDisp))^2/(2*noiseSD^2)));
         end;
     end;
     
     %TO DO call the routine that you wrote in the previous section (copy it
     %below into the bottom of this file)
-    %estDisp(cY,:) = dynamicProgram(unaryCosts,pairwiseCosts)
+    estDisp(cY,:) = dynamicProgram(unaryCosts,pairwiseCosts);
     
     %display solution so far
     subplot(1,2,2); imagesc(estDisp,[0 11]); axis off; axis image; colormap(gray); colorbar;
@@ -70,19 +70,18 @@ end;
 
 
 %TO DO - investigate how different values of alpha and noiseSD affect the results
+% Higher values of alpha value long streaks, because the disparity has a
+% stronger smoothness prior. Small values for alpha will value the noise
+% in the image to assume different disparities, where the disparity might be
+% the same. This will create noise in the disparity map, compared to the
+% ground truth.
+
+% Small values of noiseSD add a lot of noise to the retrieved disparity
+% map, but too large values add interference between distant points, and
+% create streaks in the map.
 
 %TO DO (optional) - you should be able to rewrite this with fewer loops once you have
 %the general idea so that it runs faster
 
-%TO DO (optional)- adapt the algorithm so that it makes use of colour
+%TO DO (optional) - adapt the algorithm so that it makes use of colour
 %information
-
-
-
-
- 
-
-
-
-
- 
