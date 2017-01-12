@@ -4,7 +4,7 @@
 % softmax layer combined. This is a common techinque, used to avoid 
 % numerical overflow in backpropagation. It contains two functions 
 % 'forward' and 'backward'. These compute the forward- and back-propagation 
-% steps respectively. You will need to fill out the sections marked 'TODO'.
+% steps respectively.
 
 classdef crossentropy_softmax_layer
     % The properties section lists the variables associated with this layer
@@ -27,7 +27,7 @@ classdef crossentropy_softmax_layer
             xx = x - max(x,2);
             obj.softmax_output = softmax(obj, xx);
             
-            % TODO 3.2: Compute the crossentropy
+            % Compute the crossentropy
             y = -sum(sum(target .* log(obj.softmax_output) + (1-target) .* log(1 - obj.softmax_output))) / size(target(:),1);
             
             % Store the input, output and target to object
@@ -40,7 +40,7 @@ classdef crossentropy_softmax_layer
             % Note that the softmax contains no parameters, so dLdW is
             % empty. Also note that the input gradient dLdy is a scalar.
             
-            % TODO 3.3: Compute the gradients wrt the input. (Cheatsheet)
+            % Compute the gradients wrt the input. (Cheatsheet)
             dLdx = obj.softmax_output-obj.target;
             
             % Store gradients to object

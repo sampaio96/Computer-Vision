@@ -17,11 +17,12 @@ xImCart = [  140.3464  212.1129  346.3065  298.1344   247.9962;...
 XCart = [-50 -50  50  50 0 ;...
           50 -50 -50  50 0;...
            0   0   0   0 0];
-
+        
 %We assume that the intrinsic camera matrix K is known and has values
 K = [640  0    320;...
      0    640  240;
      0    0    1];
+
 
 %draw image and 2d points
 figure; set(gcf,'Color',[1 1 1]);
@@ -37,7 +38,7 @@ TEst = estimatePlanePose(xImCart,XCart,K);
 XWireFrameCart = [-50 -50  50  50 -50 -50  50  50;...
                    50 -50 -50  50  50 -50 -50  50;...
                     0   0   0   0 -100 -100 -100 -100];
-
+XWireFrameCart = -1*XWireFrameCart;
 %TO DO Draw a wire frame cube, by projecting the vertices of a 3D cube
 %through the projective camera and drawing lines betweeen the resulting 2d image
 %points

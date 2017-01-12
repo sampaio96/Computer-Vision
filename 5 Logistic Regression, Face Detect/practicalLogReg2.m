@@ -10,8 +10,8 @@ function r=practicalLogReg2
 %function by hand and fill in the routines below
 
 %Things to investigate once you have gotten this to work
-%1.  Change the routine to use steepest descent (Eq B.4 in the book's Appendix) rather than Newton's
-%method
+%1.  Change the routine to use steepest descent (Eq B.4 in the book's Appendix)
+% rather than Newton's method
 %2.  Implement the first derivative using finite differences rather than
 %explicitly writing down the derivative (replace your implementaiton of RosenbrockDeriv)
 

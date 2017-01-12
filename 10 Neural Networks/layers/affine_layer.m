@@ -4,8 +4,7 @@
 % contains three functions a constructor, 'forward' and 'backward'. The
 % constructor creates an appropriately sized and initialized weights
 % matrix, which is stored as an object property obj.W. Forward and bacward 
-% compute the forward- and back-propagation steps respectively. You will 
-% need to fill out the sections marked 'TODO'.
+% compute the forward- and back-propagation steps respectively.
 
 classdef affine_layer
     % The properties section lists the variables associated with this layer
@@ -30,7 +29,7 @@ classdef affine_layer
         function [y, obj] = forward(obj, x)
             % Build the forward propagation step for an affine layer.
             
-            % TODO 2.1: pad the input x with ones in the last (rightmost) dimension 
+            % Pad the input x with ones in the last (rightmost) dimension 
             % and compute affine transformation
             x = [x,ones(size(x,1),1)];
             y = x*obj.W;
@@ -42,7 +41,7 @@ classdef affine_layer
         function [dLdx, obj] = backward(obj, dLdy)
             % Compute the backpropagated gradients of this layer.
             
-            % TODO 2.2: Implement the back-propagation step for the affine
+            % Implement the back-propagation step for the affine
             % layer. Remember to compute the gradient wrt the input 
             % (without bias), not the augmented input.
             dydx = obj.W(1:end-1,:).';

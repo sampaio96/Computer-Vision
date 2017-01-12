@@ -1,11 +1,7 @@
 function practicalRegress4
 %Goal: to perform Gaussian process regression of pose data.
-% TO DO Run this code, then step through it using the Matlab debugger.
-% TO DO Observe what's happening, and if possible, make the code more
-% speed-efficient.
 
-% There's nothing to actually implement in this part of the practical. 
-% All the work is done! The implementation of Gaussian process regression 
+% The implementation of Gaussian process regression 
 % regresses images of faces against poses. The code takes about a minute 
 % to run as the dimensionality and number of training examples are both quite high.
 
