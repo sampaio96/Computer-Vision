@@ -1,7 +1,6 @@
-# Computer Vision
+# Probabilistic Algorithms for Computer Vision
 
-The course addresses algorithms for automated computer vision. It focuses on building mathematical models of images and objects and using these to perform inference. Students will learn how to use these models to automatically find, segment and track objects in scenes, perform face recognition and build three-dimensional models from images.
-
+Mathematical models of images and objects used to automatically find, segment and track objects in scenes, perform face recognition and build three-dimensional models from images.
 
 ## Content:
 ### Two-dimensional visual geometry:
